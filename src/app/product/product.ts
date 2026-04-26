@@ -1,6 +1,6 @@
 import { Component ,OnInit} from '@angular/core';
 import { NgForOf} from '@angular/common';
-
+import { ProductService } from '../services/productservice';
 @Component({
   selector: 'app-product',
   imports: [NgForOf],
@@ -11,21 +11,34 @@ import { NgForOf} from '@angular/common';
 export class Product implements OnInit {
      products: Array<any> =[]; // products! ou products: any
 
-    constructor() {
+    constructor(private  productService: ProductService) {
     }
 
     ngOnInit(): void {
-  this.products=[
-    {id:1,name : "computer",price:2300,selected:true},
-    {id:2,name : "printer",price:1200,selected:false},
-    {id:3,name : "smartphone",price:3000,selected:true}]}
-
-     handleDelete(product: any) {
+      this.getAllProducts();
+       }
+    getAllProducts(){
+        this.productService.getAllProducts().subscribe({
+                                                                next: resp=>{
+                                                                  this.products = resp;
+                                                                },
+                                                                error: err => {
+                                                                  console.log(err);
+                                                                } });
+      }
+     handleDelete(product: any){
         let v = confirm('etes vous sur de vouloire supprimer?');
         if(v== true){
-         this.products = this.products.filter((p:any) => p.id != product.id)
+              this.productService.deleteProduct(product).subscribe({
+                                                               next: resp=>{
+                                                                 this.getAllProducts();
+                                                               },
+                                                               error: err => {
+                                                                 console.log(err);
+                                                               }
+                                                             });
 
          }
 
-}
+     }
  }
